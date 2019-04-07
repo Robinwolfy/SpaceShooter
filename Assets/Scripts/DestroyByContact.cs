@@ -44,19 +44,18 @@ public class DestroyByContact : MonoBehaviour
 
 	{
 
-		if (other.tag == "Boundary")
+        if (other.CompareTag("Boundary") || other.CompareTag("Enemy")) 
 
 		{
 
 			return;
 
-		}
+		}		
 
-		Destroy (other.gameObject);
-
-		Destroy (gameObject);
-
-		Instantiate (explosion, transform.position, transform.rotation);
+        if (explosion != null)
+        {
+            Instantiate(explosion, transform.position, transform.rotation);
+        }
 
 		if (other.tag == "Player")
  
@@ -68,8 +67,8 @@ public class DestroyByContact : MonoBehaviour
 		}
 
 		gameController.AddScore (scoreValue);
-
-
-	}
+        Destroy(other.gameObject);
+        Destroy(gameObject);
+    }
 
 }

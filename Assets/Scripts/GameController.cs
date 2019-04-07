@@ -15,6 +15,7 @@ public class GameController : MonoBehaviour
 	public Text scoreText;
 	public Text restartText;
 	public Text gameOverText;
+    public Text creditText;
 
 	private bool gameOver;
 	private bool restart;
@@ -26,6 +27,7 @@ public class GameController : MonoBehaviour
 		restart = false;
 		restartText.text = "";
 		gameOverText.text = "";
+        creditText.text = "";
 		StartCoroutine (spawnWaves ());
 		score = 0;
 		UpdateScore ();
@@ -41,8 +43,8 @@ public class GameController : MonoBehaviour
 			{
 				GameObject hazard = hazards [Random.Range (0, hazards.Length)];
 				Vector3 spawnPosition = new Vector3 (Random.Range (-spawnValue.x, spawnValue.x), spawnValue.y, spawnValue.z);
-				Quaternion spawnRotation = Quaternion.identity;
-				Instantiate (hazard, spawnPosition, spawnRotation);
+                Quaternion spawnRotation = Quaternion.identity;
+				Instantiate (hazard, spawnPosition, hazard.transform.rotation);
 				yield return new WaitForSeconds (spawnWait);
 			}
 			yield return new WaitForSeconds (waveWait);
@@ -69,16 +71,27 @@ public class GameController : MonoBehaviour
 
 	void UpdateScore ()
 	{
-		scoreText.text = "Score: " + score;
+		scoreText.text = "Points: " + score;
+        if(score >= 100)
+        {
+            Win();
+        }
 	}
+
+    void Win()
+    {
+        gameOver = true;
+        gameOverText.text = "YOU WIN!";
+        creditText.text = "GAME CREATED BY ROBIN NETTLES";
+    }
 
 
 	void Update ()
 	{
 		if (restart) 
 		{
-			restartText.text = "Press 'R' to Restart";
-			if (Input.GetKeyDown (KeyCode.R))
+			restartText.text = "Press 'P' to Restart";
+			if (Input.GetKeyDown (KeyCode.P))
 				SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
 		}
         if(Input.GetKeyDown(KeyCode.Escape))
