@@ -16,21 +16,40 @@ public class GameController : MonoBehaviour
 	public Text restartText;
 	public Text gameOverText;
     public Text creditText;
+    public Text homeText;
+    public AudioClip winSound;
+    public AudioClip loseSound;
+    public GameObject background;
+    public GameObject stars;
+    public GameObject backStars;
+    public bool gameOver;
+    public int maxScore;
+    
 
-	private bool gameOver;
+    ParticleSystem starParts;
+    ParticleSystem backStarParts;
+    BackgroundScroller bgScroll;
+
+	
 	private bool restart;
-	private int score;
+    private AudioSource ac;
+    private int score;
 
-	void Start ()
+    void Start ()
 	{
 		gameOver = false;
 		restart = false;
 		restartText.text = "";
 		gameOverText.text = "";
         creditText.text = "";
-		StartCoroutine (spawnWaves ());
+        homeText.text = "";
+        ac = GetComponent<AudioSource>();
+        StartCoroutine (spawnWaves ());
 		score = 0;
 		UpdateScore ();
+        starParts = stars.GetComponent<ParticleSystem>();
+        backStarParts = backStars.GetComponent<ParticleSystem>();
+        bgScroll = background.GetComponent<BackgroundScroller>();
 	}
 
 
@@ -52,7 +71,6 @@ public class GameController : MonoBehaviour
 			if (gameOver) 
 			{
 				restart = true;
-				restartText.text = "Restart?";
 				break;
 			}
 		}
@@ -62,6 +80,13 @@ public class GameController : MonoBehaviour
 	{
 		gameOver = true;
 		gameOverText.text = "GAME OVER!";
+        ac.clip = loseSound;
+        ac.Play();
+        var main = starParts.main;
+        var backMain = backStarParts.main;
+        main.simulationSpeed = 0f;
+        backMain.simulationSpeed = 0f;
+        bgScroll.scrollSpeed = 0;        
 	}	
 	public void AddScore (int newScoreValue)
 	{
@@ -72,7 +97,7 @@ public class GameController : MonoBehaviour
 	void UpdateScore ()
 	{
 		scoreText.text = "Points: " + score;
-        if(score >= 100)
+        if(score >= maxScore && !gameOver)
         {
             Win();
         }
@@ -83,6 +108,13 @@ public class GameController : MonoBehaviour
         gameOver = true;
         gameOverText.text = "YOU WIN!";
         creditText.text = "GAME CREATED BY ROBIN NETTLES";
+        var main = starParts.main;
+        var backMain = backStarParts.main;
+        main.simulationSpeed = 20f;
+        backMain.simulationSpeed = 20f;
+        bgScroll.scrollSpeed = -15;
+        ac.clip = winSound;
+        ac.Play();
     }
 
 
@@ -90,9 +122,12 @@ public class GameController : MonoBehaviour
 	{
 		if (restart) 
 		{
-			restartText.text = "Press 'P' to Restart";
-			if (Input.GetKeyDown (KeyCode.P))
+			restartText.text = "Press 'Space' to Restart";
+            homeText.text = "Press 'H' to return to the menu";
+			if (Input.GetKeyDown (KeyCode.Space))
 				SceneManager.LoadScene (SceneManager.GetActiveScene ().buildIndex);
+            if (Input.GetKeyDown(KeyCode.H))
+                SceneManager.LoadScene("Main");
 		}
         if(Input.GetKeyDown(KeyCode.Escape))
         {
